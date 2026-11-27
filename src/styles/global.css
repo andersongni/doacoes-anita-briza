@@ -288,12 +288,47 @@ a.btn-ghost:hover {
   line-height: 1.65;
 }
 
+.prose-content .content-figure {
+  display: block;
+  margin: 1.25rem 0;
+  max-width: 100%;
+}
+
+.prose-content .content-figure--sm {
+  width: min(33%, 280px);
+}
+
+.prose-content .content-figure--md {
+  width: min(50%, 480px);
+}
+
+.prose-content .content-figure--lg {
+  width: min(75%, 720px);
+}
+
+.prose-content .content-figure--full {
+  width: 100%;
+}
+
+.prose-content .content-figure--left {
+  margin-right: auto;
+  margin-left: 0;
+}
+
+.prose-content .content-figure--center {
+  margin-left: auto;
+  margin-right: auto;
+}
+
+.prose-content .content-figure--right {
+  margin-left: auto;
+  margin-right: 0;
+}
+
 .prose-content .content-image {
   display: block;
   width: 100%;
-  max-width: 100%;
   height: auto;
-  margin: 1.25rem 0;
   border-radius: var(--radius);
   border: 1px solid var(--line);
 }
@@ -302,22 +337,191 @@ a.btn-ghost:hover {
   margin-bottom: 1.5rem;
 }
 
-.content-image-field {
+/* Editor visual (estilo Word) */
+.rich-editor {
   display: flex;
-  flex-wrap: wrap;
-  align-items: center;
-  gap: 0.65rem 0.85rem;
-  margin-top: 0.65rem;
+  flex-direction: column;
+  gap: 0.55rem;
 }
 
-.content-image-field .muted {
-  flex: 1 1 16rem;
+.rich-editor-label {
+  font-weight: 700;
+  color: var(--ink);
+}
+
+.rich-editor-toolbar {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.4rem;
+  align-items: center;
+  padding: 0.45rem;
+  border: 1px solid var(--line);
+  border-radius: var(--radius);
+  background: #f4f9fc;
+}
+
+.rich-editor-toolbar-sep {
+  width: 1px;
+  height: 1.4rem;
+  background: var(--line);
+  margin: 0 0.2rem;
+}
+
+.rich-editor-help {
   margin: 0;
   font-size: 0.88rem;
 }
 
-.content-image-field code {
-  font-size: 0.82em;
+.rich-editor-canvas {
+  border: 1px solid var(--line);
+  border-radius: var(--radius);
+  background: #fff;
+  min-height: 16rem;
+  box-shadow: inset 0 1px 2px rgba(15, 36, 48, 0.04);
+}
+
+.rich-editor-surface {
+  min-height: 16rem;
+  padding: 1rem 1.1rem;
+  outline: none;
+  line-height: 1.65;
+  color: var(--ink);
+}
+
+.rich-editor-surface p {
+  margin: 0 0 0.85rem;
+}
+
+.rich-editor-surface ul {
+  margin: 0 0 0.85rem;
+  padding-left: 1.3rem;
+}
+
+.rich-editor-surface .ProseMirror-selectednode,
+.rich-editor-surface img.ProseMirror-selectednode {
+  outline: 3px solid var(--brand-cyan);
+  outline-offset: 2px;
+}
+
+.rich-editor-surface p.is-editor-empty:first-child::before {
+  color: #7a93a3;
+  content: attr(data-placeholder);
+  float: left;
+  height: 0;
+  pointer-events: none;
+}
+
+.rich-image-panel {
+  display: flex;
+  flex-direction: column;
+  gap: 0.65rem;
+  padding: 0.85rem;
+  border: 1px solid var(--brand-cyan);
+  border-radius: var(--radius);
+  background: #f4fbff;
+}
+
+.rich-image-panel-preview {
+  max-width: 10rem;
+}
+
+.rich-image-panel-preview img {
+  display: block;
+  width: 100%;
+  height: auto;
+  border-radius: var(--radius);
+  border: 1px solid var(--line);
+  background: #fff;
+}
+
+.rich-image-menu-group {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.35rem;
+  align-items: center;
+}
+
+.rich-image-menu-label {
+  width: 100%;
+  font-size: 0.78rem;
+  font-weight: 700;
+  color: var(--ink-soft);
+}
+
+.rich-image-alt {
+  flex: 1 1 12rem;
+  min-width: 10rem;
+  padding: 0.4rem 0.55rem;
+  border: 1px solid var(--line);
+  border-radius: 0.45rem;
+  background: #fff;
+}
+
+/* Imagens: tamanho + interação com texto */
+.editor-image,
+.rich-content img {
+  height: auto;
+  max-width: 100%;
+  border-radius: var(--radius);
+  border: 1px solid var(--line);
+}
+
+.editor-image--sm,
+.rich-content img[data-size='sm'] {
+  width: min(33%, 280px);
+}
+
+.editor-image--md,
+.rich-content img[data-size='md'] {
+  width: min(50%, 480px);
+}
+
+.editor-image--lg,
+.rich-content img[data-size='lg'] {
+  width: min(75%, 720px);
+}
+
+.editor-image--full,
+.rich-content img[data-size='full'] {
+  width: 100%;
+}
+
+.editor-image--wrap-inline,
+.rich-content img[data-wrap='inline'] {
+  display: inline;
+  vertical-align: middle;
+  float: none;
+  margin: 0 0.4rem;
+}
+
+.editor-image--wrap-left,
+.rich-content img[data-wrap='left'] {
+  display: block;
+  float: left;
+  clear: left;
+  margin: 0.2rem 1rem 0.85rem 0;
+}
+
+.editor-image--wrap-right,
+.rich-content img[data-wrap='right'] {
+  display: block;
+  float: right;
+  clear: right;
+  margin: 0.2rem 0 0.85rem 1rem;
+}
+
+.editor-image--wrap-break,
+.rich-content img[data-wrap='break'] {
+  display: block;
+  float: none;
+  clear: both;
+  margin: 1rem auto;
+}
+
+.rich-content::after {
+  content: '';
+  display: table;
+  clear: both;
 }
 
 .card-grid {

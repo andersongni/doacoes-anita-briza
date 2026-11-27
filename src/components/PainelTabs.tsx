@@ -1,7 +1,7 @@
 'use client';
 
-import { useRef, useState } from 'react';
-import { ContentImageField } from '@/components/ContentImageField';
+import { useState } from 'react';
+import { RichContentEditor } from '@/components/RichContentEditor';
 
 type Publicacao = {
   id: string;
@@ -104,8 +104,6 @@ export function PainelTabs({
   const [editingPub, setEditingPub] = useState<Publicacao | null>(null);
   const [creatingPub, setCreatingPub] = useState(false);
   const [editingPage, setEditingPage] = useState<Page | null>(null);
-  const pubContentRef = useRef<HTMLTextAreaElement>(null);
-  const pageContentRef = useRef<HTMLTextAreaElement>(null);
 
   return (
     <>
@@ -179,18 +177,12 @@ export function PainelTabs({
                   <option value="PRESTACAO_CONTAS">Prestação de contas</option>
                 </select>
               </div>
-              <div className="form-row">
-                <label>Conteúdo</label>
-                <textarea
-                  ref={pubContentRef}
-                  name="content"
-                  required
-                  minLength={3}
-                  rows={10}
-                  defaultValue={editingPub?.content || ''}
-                />
-                <ContentImageField textareaRef={pubContentRef} />
-              </div>
+              <RichContentEditor
+                key={editingPub?.id || 'new-pub'}
+                name="content"
+                label="Conteúdo"
+                initialContent={editingPub?.content || ''}
+              />
               <label>
                 <input
                   type="checkbox"
@@ -292,18 +284,12 @@ export function PainelTabs({
                   readOnly={editingPage.slug === 'obrigado'}
                 />
               </div>
-              <div className="form-row">
-                <label>Conteúdo</label>
-                <textarea
-                  ref={pageContentRef}
-                  name="content"
-                  required
-                  minLength={3}
-                  rows={10}
-                  defaultValue={editingPage.content}
-                />
-                <ContentImageField textareaRef={pageContentRef} />
-              </div>
+              <RichContentEditor
+                key={editingPage.id}
+                name="content"
+                label="Conteúdo"
+                initialContent={editingPage.content}
+              />
               <label>
                 <input
                   type="checkbox"

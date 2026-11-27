@@ -1,5 +1,5 @@
-import ReactMarkdown from 'react-markdown';
-import remarkBreaks from 'remark-breaks';
+import { looksLikeHtml, sanitizeContentHtml } from '@/lib/rich-content';
+import { ContentMarkdownFallback } from '@/components/ContentMarkdownFallback';
 
 type Props = {
   content: string;
@@ -7,29 +7,15 @@ type Props = {
 };
 
 export function ContentBody({ content, className = 'prose' }: Props) {
+  if (!looksLikeHtml(content)) {
+    return <ContentMarkdownFallback content={content} className={className} />;
+  }
+
+  const html = sanitizeContentHtml(content);
   return (
-    <article className={`${className} prose-content`}>
-      <ReactMarkdown
-        remarkPlugins={[remarkBreaks]}
-        components={{
-          img: ({ src, alt }) => (
-            // eslint-disable-next-line @next/next/no-img-element
-            <img
-              src={src || ''}
-              alt={alt || ''}
-              className="content-image"
-              loading="lazy"
-            />
-          ),
-          a: ({ href, children }) => (
-            <a href={href} target="_blank" rel="noreferrer">
-              {children}
-            </a>
-          ),
-        }}
-      >
-        {content}
-      </ReactMarkdown>
-    </article>
+    <article
+      className={`${className} prose-content rich-content`}
+      dangerouslySetInnerHTML={{ __html: html }}
+    />
   );
 }

@@ -81,11 +81,16 @@ A página de agradecimento (`slug` `obrigado`) e a mensagem de compartilhamento 
 
 ## Imagens no conteúdo
 
-No editor de publicação/página use **Inserir imagem** ou markdown:
+Editor visual (estilo Word) em Publicações e Páginas:
 
-```md
-![descrição](/uploads/arquivo.jpg)
-```
+1. Escreva o texto normalmente
+2. **Inserir imagem** pela barra de ferramentas
+3. **Clique na imagem** para abrir o menu:
+   - **Tamanho** — pequena, média, grande, largura da página
+   - **Texto em volta** — alinhado ao texto, texto à direita, texto à esquerda, acima e abaixo
+   - Texto alternativo e remover
+
+Sem digitar código.
 
 ## Pacote standalone (Windows)
 
