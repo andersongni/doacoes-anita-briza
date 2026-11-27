@@ -48,11 +48,12 @@
     "typescript": "^5.7.0"
   },
   "engines": {
-    "node": ">=20"
+    "node": "24.x"
   },
   "overrides": {
     "postcss": "8.5.34",
     "deepmerge-ts": "8.0.0",
-    "effect": "3.22.1"
+    "effect": "3.22.1",
+    "jsdom": "25.0.1"
   }
 }
