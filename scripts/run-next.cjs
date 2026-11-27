@@ -19,7 +19,12 @@ if (fs.existsSync(envPath)) {
 
 const mode = process.argv[2] === 'start' ? 'start' : 'dev';
 const port = String(process.env.PORT || 3000).trim();
-const host = process.env.HOST || '127.0.0.1';
+// Em produção (Railway etc.) escuta em todas as interfaces; localmente só localhost
+const host =
+  process.env.HOST ||
+  (process.env.NODE_ENV === 'production' || process.env.RAILWAY_ENVIRONMENT
+    ? '0.0.0.0'
+    : '127.0.0.1');
 
 const nextCli = path.join(root, 'node_modules', 'next', 'dist', 'bin', 'next');
 if (!fs.existsSync(nextCli)) {
