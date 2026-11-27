@@ -34,6 +34,9 @@ const prisma = new PrismaClient();
   } finally {
     await prisma.$disconnect();
   }
+
+  // Sempre alinha a senha do admin com ADMIN_PASSWORD do ambiente
+  run('node', [path.join(__dirname, 'sync-admin-password.cjs')]);
 })().catch((err) => {
   console.error(err);
   process.exit(1);

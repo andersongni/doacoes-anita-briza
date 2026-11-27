@@ -23,6 +23,14 @@ if (!process.env.ADMIN_EMAIL?.trim()) {
   process.exit(1);
 }
 
+if (!process.env.ADMIN_PASSWORD?.trim()) {
+  console.error(
+    '\nFATAL: ADMIN_PASSWORD é obrigatória.\n' +
+      'Defina no .env — ela é aplicada ao admin no startup do site.\n',
+  );
+  process.exit(1);
+}
+
 if (!process.env.NEXT_PUBLIC_RECAPTCHA_SITE_KEY?.trim()) {
   console.error(
     '\nFATAL: NEXT_PUBLIC_RECAPTCHA_SITE_KEY é obrigatória.\n' +
