@@ -1,0 +1,83 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "sqlite"
+  url      = env("DATABASE_URL")
+}
+
+enum UserStatus {
+  PENDING
+  APPROVED
+  REJECTED
+}
+
+enum UserRole {
+  USER
+  ADMIN
+}
+
+enum PublicacaoCategory {
+  CAMPANHA
+  PRESTACAO_CONTAS
+}
+
+model User {
+  id           String        @id @default(cuid())
+  firstName    String
+  lastName     String
+  email        String        @unique
+  password     String
+  role         UserRole      @default(USER)
+  status       UserStatus    @default(PENDING)
+  createdAt    DateTime      @default(now())
+  updatedAt    DateTime      @updatedAt
+  publicacoes  Publicacao[]
+  pages        Page[]
+}
+
+model Publicacao {
+  id        String              @id @default(cuid())
+  title     String
+  slug      String              @unique
+  content   String
+  excerpt   String?
+  category  PublicacaoCategory
+  published Boolean             @default(true)
+  authorId  String?
+  author    User?               @relation(fields: [authorId], references: [id])
+  createdAt DateTime            @default(now())
+  updatedAt DateTime            @updatedAt
+}
+
+model Page {
+  id        String   @id @default(cuid())
+  title     String
+  slug      String   @unique
+  content   String
+  published Boolean  @default(true)
+  authorId  String?
+  author    User?    @relation(fields: [authorId], references: [id])
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model Donation {
+  id            String   @id @default(cuid())
+  amount        Float
+  donorName     String
+  document      String
+  email         String
+  phone         String
+  birthDate     String
+  pixCode       String
+  publicacaoId  String?
+  createdAt     DateTime @default(now())
+}
+
+model SiteSetting {
+  key       String   @id
+  value     String
+  updatedAt DateTime @updatedAt
+}

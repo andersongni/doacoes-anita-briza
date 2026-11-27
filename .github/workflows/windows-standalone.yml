@@ -1,0 +1,71 @@
+name: Pacote standalone Windows
+
+on:
+  push:
+    branches: [main, master]
+  pull_request:
+    branches: [main, master]
+  workflow_dispatch:
+  release:
+    types: [published]
+
+concurrency:
+  group: windows-standalone-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  build-windows-standalone:
+    name: Build standalone (Windows)
+    runs-on: windows-latest
+    timeout-minutes: 30
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: "20"
+          cache: npm
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Prisma generate
+        run: npx prisma generate
+        env:
+          DATABASE_URL: file:./ci.db
+
+      - name: Build Next.js (standalone)
+        run: npm run build
+        env:
+          DATABASE_URL: file:./ci.db
+          ADMIN_EMAIL: ci@example.com
+          ADMIN_PASSWORD: CiBuild@123456
+          JWT_SECRET: ci-build-secret-min-32-characters-long
+          NEXT_PUBLIC_RECAPTCHA_SITE_KEY: ci-site-key
+          RECAPTCHA_SECRET_KEY: ci-secret-key
+          NODE_ENV: production
+          NEXT_TELEMETRY_DISABLED: "1"
+          PORT: "3000"
+
+      - name: Empacotar standalone
+        shell: pwsh
+        run: .\scripts\pack-standalone.ps1
+
+      - name: Upload artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: anita-briza-windows-standalone
+          path: dist-standalone/anita-briza-windows-standalone.zip
+          if-no-files-found: error
+          retention-days: 30
+
+      - name: Anexar ao release
+        if: github.event_name == 'release'
+        uses: softprops/action-gh-release@v2
+        with:
+          files: dist-standalone/anita-briza-windows-standalone.zip
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}

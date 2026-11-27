@@ -1,0 +1,42 @@
+{
+  "name": "anita-briza",
+  "private": true,
+  "scripts": {
+    "predev": "node scripts/check-env.cjs",
+    "dev": "node scripts/run-next.cjs dev",
+    "prebuild": "node scripts/check-env.cjs",
+    "build": "next build",
+    "prestart": "node scripts/check-env.cjs",
+    "start": "node scripts/run-next.cjs start",
+    "prisma:generate": "prisma generate",
+    "prisma:push": "prisma db push",
+    "seed": "tsx prisma/seed.ts",
+    "pack:standalone": "powershell -NoProfile -ExecutionPolicy Bypass -File ./scripts/pack-standalone.ps1"
+  },
+  "dependencies": {
+    "@prisma/client": "^6.0.0",
+    "bcryptjs": "^2.4.3",
+    "dotenv": "^16.4.5",
+    "jose": "^5.9.6",
+    "next": "^15.1.0",
+    "qrcode.react": "^4.2.0",
+    "react": "^19.0.0",
+    "react-dom": "^19.0.0",
+    "react-google-recaptcha": "^3.1.0",
+    "react-markdown": "^10.1.0",
+    "remark-breaks": "^4.0.0"
+  },
+  "devDependencies": {
+    "@types/bcryptjs": "^2.4.6",
+    "@types/node": "^22.0.0",
+    "@types/react": "^19.0.0",
+    "@types/react-dom": "^19.0.0",
+    "@types/react-google-recaptcha": "^2.1.9",
+    "prisma": "^6.0.0",
+    "tsx": "^4.19.0",
+    "typescript": "^5.7.0"
+  },
+  "engines": {
+    "node": ">=20"
+  }
+}
