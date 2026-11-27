@@ -11,7 +11,7 @@ $OutDir = Join-Path $Root "dist-standalone\anita-briza-windows"
 $ZipPath = Join-Path $Root "dist-standalone\anita-briza-windows-standalone.zip"
 
 if (-not (Test-Path $StandaloneSrc)) {
-  Write-Host "Pasta .next\standalone nao encontrada. Rode: npm run build"
+  Write-Host "Pasta .next\standalone nao encontrada. Rode: `$env:BUILD_STANDALONE=1; npm run build"
   exit 1
 }
 if (-not (Test-Path $StaticSrc)) {
