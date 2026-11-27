@@ -6,7 +6,7 @@
     "predev": "node scripts/check-env.cjs",
     "dev": "node scripts/run-next.cjs dev",
     "prebuild": "node scripts/check-env.cjs",
-    "build": "next build",
+    "build": "node scripts/ensure-db.cjs && next build",
     "prestart": "node scripts/check-env.cjs",
     "start": "node scripts/run-next.cjs start",
     "ensure-db": "node scripts/ensure-db.cjs",

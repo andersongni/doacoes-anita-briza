@@ -37,3 +37,5 @@ apps/
 dist-standalone/
 *.zip
 !docs/**/*.zip
+.vercel
+.env*
