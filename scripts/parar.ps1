@@ -5,13 +5,30 @@ Set-Location $Root
 
 $RuntimeDir = Join-Path $Root ".runtime"
 $PidFile = Join-Path $RuntimeDir "pids.env"
+$EnvFile = Join-Path $Root ".env"
+
+function Get-EnvPort([string]$File, [int]$Default = 3000) {
+  if (-not (Test-Path $File)) { return $Default }
+  $m = Select-String -Path $File -Pattern '^\s*PORT\s*=\s*(\d+)\s*$' | Select-Object -First 1
+  if ($m -and ($m.Matches.Groups[1].Value -as [int])) {
+    return [int]$m.Matches.Groups[1].Value
+  }
+  return $Default
+}
 
 function Get-PortOwnerPid([int]$Port) {
   try {
-    $lines = netstat -ano -p tcp | Select-String ":$Port\s+.*LISTENING"
+    # Casamento exato da porta local (evita 300 bater em 3000)
+    $pattern = "[:.]$Port\s+.*LISTENING"
+    $lines = netstat -ano -p tcp | Select-String $pattern
     foreach ($line in $lines) {
       $parts = ($line.ToString() -split "\s+") | Where-Object { $_ -ne "" }
-      if ($parts.Length -ge 5) { return [int]$parts[-1] }
+      if ($parts.Length -ge 5) {
+        $local = $parts[1]
+        if ($local -match "[:.]$Port$") {
+          return [int]$parts[-1]
+        }
+      }
     }
   } catch {}
   return $null
@@ -31,65 +48,50 @@ function Stop-Tree([int]$ProcessId, [string]$Label) {
 }
 
 $stopped = 0
+$port = Get-EnvPort $EnvFile 3000
+$webPid = $null
 
 if (Test-Path $PidFile) {
-  $map = @{}
   Get-Content $PidFile | ForEach-Object {
-    if ($_ -match '^\s*([A-Z_]+)\s*=\s*(.+)\s*$') {
-      $map[$matches[1]] = $matches[2].Trim()
+    if ($_ -match '^\s*WEB_PID\s*=\s*(\d+)\s*$') {
+      $webPid = [int]$Matches[1]
+    }
+    if ($_ -match '^\s*PORT\s*=\s*(\d+)\s*$') {
+      $port = [int]$Matches[1]
     }
   }
-  if ($map.ContainsKey("WEB_PID")) {
-    if (Stop-Tree ([int]$map["WEB_PID"]) "WEB") { $stopped++ }
-  }
-  if ($map.ContainsKey("API_PID")) {
-    if (Stop-Tree ([int]$map["API_PID"]) "API") { $stopped++ }
-  }
 } else {
-  Write-Host "Arquivo .runtime\pids.env nao encontrado. Tentando pelas portas..."
+  Write-Host "Arquivo .runtime\pids.env nao encontrado. Usando PORT=$port do .env."
 }
 
-$ports = New-Object System.Collections.Generic.HashSet[int]
-[void]$ports.Add(3000)
-[void]$ports.Add(3001)
-[void]$ports.Add(5173)
-if (Test-Path $PidFile) {
-  $portLine = Get-Content $PidFile | Where-Object { $_ -match '^\s*PORT\s*=\s*(\d+)' } | Select-Object -First 1
-  if ($portLine -match '(\d+)') { [void]$ports.Add([int]$Matches[1]) }
-}
-$envPort = $null
-$envFile = Join-Path $Root ".env"
-if (Test-Path $envFile) {
-  $m = Select-String -Path $envFile -Pattern '^\s*PORT\s*=\s*(\d+)' | Select-Object -First 1
-  if ($m) { [void]$ports.Add([int]$m.Matches.Groups[1].Value) }
+Write-Host "Analisando apenas a porta do projeto: $port"
+
+if ($webPid) {
+  if (Stop-Tree $webPid "WEB") { $stopped++ }
 }
 
-foreach ($port in $ports) {
-  $pidOnPort = Get-PortOwnerPid $port
-  if ($pidOnPort -and $pidOnPort -gt 0) {
+$pidOnPort = Get-PortOwnerPid $port
+if ($pidOnPort -and $pidOnPort -gt 0) {
+  # Evita matar de novo o mesmo PID ja encerrado via WEB_PID
+  if (-not $webPid -or $pidOnPort -ne $webPid) {
     if (Stop-Tree $pidOnPort "porta $port") { $stopped++ }
   } else {
-    Write-Host "Nada escutando na porta $port."
+    # Confirma se a porta ainda esta ocupada apos matar a arvore do WEB_PID
+    Start-Sleep -Milliseconds 400
+    $still = Get-PortOwnerPid $port
+    if ($still -and $still -gt 0) {
+      if (Stop-Tree $still "porta $port") { $stopped++ }
+    }
   }
+} else {
+  Write-Host "Nada escutando na porta $port."
 }
 
-Start-Sleep -Milliseconds 500
-Get-CimInstance Win32_Process -ErrorAction SilentlyContinue |
-  Where-Object {
-    $_.CommandLine -and (
-      ($_.CommandLine -like "*next*" -and $_.CommandLine -like "*site-campanha-doacao*") -or
-      $_.CommandLine -like "*@anita-briza/*"
-    )
-  } |
-  ForEach-Object {
-    Write-Host "Encerrando processo residual PID $($_.ProcessId)..."
-    & taskkill /PID $_.ProcessId /T /F 2>$null | Out-Null
-    $stopped++
-  }
-
-if (Test-Path $PidFile) { Remove-Item $PidFile -Force -ErrorAction SilentlyContinue }
+if (Test-Path $PidFile) {
+  Remove-Item $PidFile -Force -ErrorAction SilentlyContinue
+}
 
 Write-Host ""
-if ($stopped -gt 0) { Write-Host "Servicos encerrados." }
-else { Write-Host "Nenhum servico ativo encontrado." }
+if ($stopped -gt 0) { Write-Host "Servico encerrado." }
+else { Write-Host "Nenhum servico ativo encontrado na porta $port." }
 exit 0
