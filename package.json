@@ -49,5 +49,10 @@
   },
   "engines": {
     "node": ">=20"
+  },
+  "overrides": {
+    "postcss": "8.5.34",
+    "deepmerge-ts": "8.0.0",
+    "effect": "3.22.1"
   }
 }
